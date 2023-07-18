@@ -2,25 +2,29 @@ class Game
     attr_accessor :human_player, :ennemies
 
     def initialize(name)
-        @ennemies = 4
-        @human_player = name
+        player1 = Player.new("josé", 10)
+        player2 = Player.new("Marie", 10)
+        player3 = Player.new("joseanne", 10)
+        player4 = Player.new("lou", 10)
+        @ennemies = [player1, player2, player3, player4]
+        @human_player = HumanPlayer.new(name)
     end
     
-
-    def kill_player
-        @ennemies -= 1
+    def kill_player(player)
+       @ennemies.delete(player)
     end
 
-    def is_still_ongoing?(bool)
-        if @human_player.life_points > 0 && @ennemies > 0
-            bool = true
-            puts "#{bool.to_s}"
+    def is_still_ongoing?
+        if @human_player.life_points > 0 && @ennemies.length > 0
+            return true
+        else
+            return false
         end
     end
 
     def show_players
-        puts "#{@human_player} a #{@life_points} points de vie et à une arme de niveau #{@weapon_level}."
-        puts "il reste #{@ennemies} ennemies"
+        @human_player.show_state
+        puts "il reste #{@ennemies.length} ennemies"
     end
 
     def menu
@@ -28,28 +32,29 @@ class Game
         puts "a - chercher une meilleure arme"
         puts "s - chercher à se soigner"
         puts "attaquer un joueur en vue :"
-        @ennemies.each do |n_of_ennemies|
-        print "#{n_of_ennemies} - " 
-       # print "#{player{n_of_ennemies}.show_state}"
+        @ennemies.each do |player|
+       print "#{@ennemies.index(player)} -"
+       print "#{player.show_state}"
         end
+        choice = gets.chomp
+        menu_choice(choice)
     end
 
-    def menu_choice
-        choice = gets.chomp
+    def menu_choice(choice)
         if choice == "a" 
-            user.search_weapon
+            @human_player.search_weapon
         elsif choice == "s"
-            user.search_health_pack
-=beginelsif choice == "#{n_of_ennemies}"
-            user.attack(player1) 
-=end
+            @human_player.search_health_pack
         else
-            puts "mauvaise option"
+            @human_player.attack(@ennemies[choice.to_i]) 
+            if @ennemies[choice.to_i].life_points <= 0
+                kill_player(@ennemies[choice.to_i])
+            end
         end
     end
 
     def enemies_attack
-        ennemies.each do |player|
+        @ennemies.each do |player|
             if player.life_points > 0
                 player.attack(@human_player)
             end
